@@ -4,6 +4,7 @@ import pandas as pd
 import pandas_datareader.data as web
 import datetime as dt
 import bs4 as bs
+import yfinance as yf
 
 
 API_KEY = 'PKCGQRZSPSWL4C473414'  #APCA-API-KEY-ID
@@ -65,13 +66,19 @@ if __name__=="__main__":
      = get_price('GOOG',start,end)
     print()
     '''
+
+    pzza = yf.Ticker("PZZA")
+    df = pzza.history(period="2d")
+    print(df)
+
+
     
     # = get_price("GOOG", "minute", 5)
 
-    sp500_list = get_sp500_stocks()
+    #sp500_list = get_sp500_stocks()
     #print(sp500_list)
-    sp500_ = get_all_(sp500_list)
-    print(sp500_)
+    #sp500_ = get_all_(sp500_list)
+    #print(sp500_)
 
     #response = send_order("GOOG", 50, "buy", "market", "gtc")
     #print(response)
