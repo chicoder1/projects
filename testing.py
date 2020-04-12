@@ -27,21 +27,58 @@ def get_price(symbol, start, end):
 def get_sp500_stocks():
     data = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
     table = data[0]
-    stocks = []
+    bullish_engulfing_stocks = []
     for index, row in table[['Symbol']].iterrows():
-        stocks.append(str(row['Symbol']))
-    return stocks
-
-
-def get_all_(stocks):
-    dic = {}
-    for stock in stocks:
-        start = dt.datetime.now() - dt.timedelta(1)       
-        end = dt.datetime.now()
+        stock = str(row['Symbol'])
         if stock.isalpha():
-            data = web.DataReader(stock,'yahoo',start,end)
-            dic[stock] = float(data['Open'].values)
-    return dic
+            df = get_stock_prices(stock, '5d')
+            if is_bullish_engulfing(df):
+                bullish_engulfing_stocks.append(stock)
+    return bullish_engulfing_stocks
+
+
+def get_stock_prices(stock, interval):
+    ticker = yf.Ticker(stock)
+    df = ticker.history(period=interval)
+    return df
+
+
+def buy_stocks(stocks):
+    for stock in stocks:
+        send_order(stock, 10, "buy", "market", "gtc")
+    return None
+
+
+def sell_stocks(stocks):
+    for stock in stocks:
+        send_order(stock, 10, "buy", "market", "gtc")
+    return None
+
+
+def is_bullish_engulfing(df):
+    is_bullish_engulfing_flag = False
+
+    first_open = float(df.iloc[0,0])
+    first_close = float(df.iloc[0,3])
+    
+    second_open = float(df.iloc[1,0])
+    second_close = float(df.iloc[1,3])
+    
+    third_open = float(df.iloc[2,0])
+    third_close = float(df.iloc[2,3])
+    
+    fourth_open = float(df.iloc[3,0])
+    fourth_close = float(df.iloc[3,3])
+
+    last_open = float(df.iloc[4,0])
+    last_close = float(df.iloc[4,3])
+
+    if last_close > first_open and last_close > first_close and last_open < first_open and last_open < first_close \
+        and last_close > second_open and last_close > second_close and last_open < second_open and last_open < second_close\
+        and last_close > third_open and last_close > third_close and last_open < third_open and last_open < third_close\
+        and last_close > fourth_open and last_close > fourth_close and last_open < fourth_open and last_open < fourth_close:
+        is_bullish_engulfing_flag = True
+    return is_bullish_engulfing_flag
 
 
 def send_order(symbol, qty, side, order_type, time):
@@ -57,28 +94,18 @@ def send_order(symbol, qty, side, order_type, time):
 
 
 if __name__=="__main__":
-    #print(get_account())
-
-    '''
-    start = dt.datetime.now() - dt.timedelta(1)
-    end = dt.datetime.now()
-
-     = get_price('GOOG',start,end)
-    print()
-    '''
-
-    pzza = yf.Ticker("PZZA")
-    df = pzza.history(period="2d")
-    print(df)
-
-
     
-    # = get_price("GOOG", "minute", 5)
+    api = trade_api.REST(API_KEY,API_SECRET,BASE_URL)    
+    
+    stocks = get_sp500_stocks()
 
-    #sp500_list = get_sp500_stocks()
-    #print(sp500_list)
-    #sp500_ = get_all_(sp500_list)
-    #print(sp500_)
+    account = api.get_account()
+    
+    if account.buying_power > 10000 and dt.datetime.today().weekday() != 5:
+        for stock in stocks:
+            send_order(stock, 20, "buy", "market", "gtc")   
 
-    #response = send_order("GOOG", 50, "buy", "market", "gtc")
-    #print(response)
+    if dt.datetime.today().weekday() == 5:
+        portfolio = api.list_positions()
+        for position in portfolio:
+            send_order(stock, 20, "sell", "market", "gtc")

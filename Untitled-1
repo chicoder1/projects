@@ -1,0 +1,67 @@
+
+
+
+
+select country_name, motorcycle_model, isnull(sum(revenue),0) as revenue from (
+    select c.name as country_name, m.name as motorcycle_model, price * quantity as revenue
+    from  country c 
+    left outer join motorcycle_model m on 1=1
+    left outer join sales s on c.id=s.country_id and m.id=s.model_id and year(sales_date)='2018'
+) s
+group by country_name, motorcycle_model
+
+
+select first_name, last_name, vpa, total as current_balance, case when credit_limit > -1 * total then 'NO' else 'YES' end as credit_limit_breached from
+(
+    select first_name, last_name, vpa, credit_limit, sum(total) as total from
+    (
+        select paid_by as finuser, -1 * amount as total from transaction_log
+        union all
+        select paid_to as finuser, amount as total from transaction_log
+    ) t
+    left join user_financial_detail f on f.vpa=t.finuser
+    group by first_name, last_name, vpa, credit_limit
+) b
+
+
+
+
+
+select p.name, c.name from
+    (
+        select prev_company_id from (
+            select prev_company_id, rank() over (order by totalLeft desc) as rnk from (
+                select prev_company_id, count(1) as totalLeft from people
+                group by prev_company_id
+            ) p1
+        ) p3 where rnk = 1
+    ) p2
+    inner join people p on p.curr_company_id = p2.prev_company_id
+    inner join companies c on c.id = p.curr_company_id
+
+
+def getDistanceMetrics(arr):
+    # Write your code here
+    totalLs = []
+    for i, x in enumerate(arr):
+        tempInt = 0
+        for j, y in enumerate(arr):
+            if x == y:
+                tempInt += abs(i - j)
+        totalLs.append(tempInt)
+    return totalLs
+
+
+
+    def getDistanceMetrics(arr):
+    # Write your code here
+    totalLs = []
+    dic = {}
+    for i, x in enumerate(arr):
+        if x not in dic:
+            dic[x] = [i]
+        else:
+            
+            dic[x].append(i)
+    print(dic)
+    return dic
