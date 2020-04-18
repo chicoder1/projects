@@ -7,8 +7,8 @@ import bs4 as bs
 import yfinance as yf
 
 
-API_KEY = 'PKCGQRZSPSWL4C473414'  #APCA-API-KEY-ID
-API_SECRET = 'XPz2wUSl6L6wDY6BEn7MM4GIicBBEuQtnaawmqvg' #APCA-API-SECRET-KEY
+API_KEY = ''  #APCA-API-KEY-ID
+API_SECRET = ''  #APCA-API-SECRET-KEY
 BASE_URL = 'https://paper-api.alpaca.markets'
 HEADERS = {'APCA-API-KEY-ID':API_KEY, 'APCA-API-SECRET-KEY':API_SECRET}
 
