@@ -1,0 +1,2 @@
+select top 100* from dbo.PositionDetails
+where [Position Id] = '7IW200003'
